@@ -249,14 +249,14 @@ public class Calc {
 			if (m_double.find() && !expectedOperator)
 			{
 				String expr = m_double.group(1);
-				s = s.replaceFirst("^([-]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)\\s*", "");
+				s = s.replaceFirst("^\\s*([-]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)\\s*", "");
 				expression.add(expr);
 				expectedOperator = true;
 			}
 			else if (m_funct.find())
 			{
 				String expr = m_funct.group(1);
-				s = s.replaceFirst("^([a-zA-Z]+\\((?:(?:[a-zA-Z]+|[-]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?)\\s*,\\s*)*(?:(?:[a-zA-Z]+|[-]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?))\\))", "");
+				s = s.replaceFirst("^\\s*([a-zA-Z]+\\((?:(?:[a-zA-Z]+|[-]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?)\\s*,\\s*)*(?:(?:[a-zA-Z]+|[-]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?))\\))", "");
 				String func_name = expr.replaceAll("\\(.*$", "");
 				String func_params = expr.replaceAll("^.*\\(", "").replace("\\)", "");
 				
