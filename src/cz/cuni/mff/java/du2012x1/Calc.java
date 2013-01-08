@@ -188,7 +188,7 @@ public class Calc {
 	{
 		Pattern pt = Pattern.compile("^\\s*DEF\\s+[a-zA-Z]+\\(([a-zA-Z]\\s*,\\s*)*([a-zA-Z])\\)\\s+(((\\(\\s*)*(([a-zA-Z]|[-]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)\\s*(\\)\\s*)*)\\s*[/*+-]\\s*)*\\s*(\\(\\s*)*([a-zA-Z]|[-]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?))\\s*(\\)\\s*)*?$");
 		Matcher m = pt.matcher(s);
-		//if(s.matches("^\\s*DEF\\s+[a-zA-Z]+\\(\\)"))
+
 		if (m.find())
 		{
 			if (ValidateFunction(s))
@@ -232,10 +232,8 @@ public class Calc {
 		boolean expectedOperator = false;
 		String str = "";
 
-		//Pattern double_pattern = Pattern.compile("^\\s*([-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)\\s*");
 		Pattern gdouble_pattern = Pattern.compile("^\\s*([-]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?)\\s*.*");
 		Pattern gvar_pattern = Pattern.compile("^\\s*([a-zA-Z]+)\\s*");
-		//Pattern proper_symbols = Pattern.compile("^\\s*(\\(|\\)|[=*/+-])\\s*.*"); //brackets + operators
 		Pattern proper_operators = Pattern.compile("^\\s*([=*/+-])\\s*.*");
 		Pattern l_brackets_pattern = Pattern.compile("^\\s*(\\()\\s*.*");
 		Pattern r_brackets_pattern = Pattern.compile("^\\s*(\\))\\s*.*");
@@ -243,10 +241,8 @@ public class Calc {
 		while (!s.equals("") && (!s.equals("\n"))) 
 		{
 			Matcher m_double = gdouble_pattern.matcher(s);
-			//Matcher m_symbols = proper_symbols.matcher(s);
 			Matcher m_operator = proper_operators.matcher(s);
 			Matcher left_m_brackets = l_brackets_pattern.matcher(s);
-			//System.out.println(left_m_brackets.find());
 			Matcher right_m_brackets = r_brackets_pattern.matcher(s);
 			Matcher m_var = gvar_pattern.matcher(s);
 			Matcher m_funct = funct_pattern.matcher(s);
@@ -261,9 +257,6 @@ public class Calc {
 			{
 				String expr = m_funct.group(1);
 				s = s.replaceFirst("^([a-zA-Z]+\\((?:(?:[a-zA-Z]+|[-]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?)\\s*,\\s*)*(?:(?:[a-zA-Z]+|[-]?[0-9]*\\.?[0-9]+(?:[eE][-+]?[0-9]+)?))\\))", "");
-				//expression.add(expr);
-				
-
 				String func_name = expr.replaceAll("\\(.*$", "");
 				String func_params = expr.replaceAll("^.*\\(", "").replace("\\)", "");
 				
@@ -282,14 +275,6 @@ public class Calc {
 				}
 				
 			}
-			else if (false) // if (m_symbols.find())
-			{
-				String expr =  "";//m_symbols.group(1);
-				s = s.replaceFirst("^\\s*(\\(|\\)|[=*/+-])\\s*", "");
-				expression.add(expr);
-				expectedOperator = false;
-			}			
-			/*HMIRA - odvážna úprava*/
 			else if (m_operator.find() && expectedOperator)
 			{
 				String expr = m_operator.group(1);
@@ -309,7 +294,6 @@ public class Calc {
 				s = s.replaceFirst("^\\s*(\\))\\s*", "");
 				expression.add(expr);
 			}
-			/*!HMIRA*/
 			else if (m_var.find() && !expectedOperator)
 			{
 				String expr = m_var.group(1);
@@ -323,111 +307,7 @@ public class Calc {
 			}
 			System.out.print("");
 		}
-		
-		/*for (int i = 0; i < s.length(); i++) 
-		{
-		
-			char c = s.charAt(i);
-			
-			if (Character.isWhitespace(c) && str == "")
-			{
-				continue;
-			}
-			else if (expectedVar && (c == '(') )
-			{
-				expression.add(Character.toString(c));
-			}
-			else if ((c == ')') )
-			{
-				if (!str.equals(""))
-				{
-					expression.add(str);
-					str = "";
-				}
-				expression.add(Character.toString(c));
-				number = false;
-				variable = false;
-				expectedOperator = true;
-				expectedVar = false;
-			}
-			else if (expectedVar && 
-					(Character.isDigit(c) || (c == '.') || (c == 'e') || (c == '-' && !number)))
-			{
-				if (variable)
-					return Double.NaN;
-				if(number && (c == '-' ))
-					return Double.NaN;
-				if (c != '-')
-					expectedOperator = true;
-				number = true;
-				
-				if (Character.isWhitespace(c))
-				{
-					expectedVar = false;
-					number = false;
-					variable = false;
-					expectedOperator = true;
-					continue;
-				}
-				
-				str += Character.toString(c);
-			}
-			else if (expectedVar && Character.isWhitespace(c))
-			{
-				expression.add(str);
-				str = "";
-				expectedVar = false;
-				expectedOperator = true;
-			}
-			else if (expectedVar && (Character.isLetter(c)))
-			{
-				if (number)
-					return Double.NaN;
-				
-				if (Character.isWhitespace(c))
-				{
-					expectedVar = false;
-					number = false;
-					variable = false;
-					expectedOperator = true;
-					continue;
-				}
-				
-				expectedOperator = true;
-				variable = true;
-				str += Character.toString(c);
-			}
-			else if (expectedVar && (Character.isWhitespace(c)))
-			{
-				expression.add(str);
-				str = "";
-				expectedVar = false;
-				variable = false;
-				number = false;
-				expectedOperator = true;
-			}
-			else if ((expectedOperator) &&
-				((c == '+') || (c == '-') 
-				|| (c == '*') || (c == '/')))
-			{
-				if (!str.equals(""))
-				{
-					expression.add(str);
-					str = "";
-				}
-				expression.add(Character.toString(c));
-				expectedVar = true;
-				expectedOperator = false;
-				number = false;
-				variable = false;
-			}
-			else
-			{
-				return Double.NaN;
-			}
-			
-		}*/
-		
+
 		EvaluateBraces(expression);
 		
 		EvaluateMult(expression);
@@ -437,7 +317,6 @@ public class Calc {
 				expression.remove(i--);
 				continue;
 			}
-			//System.out.println(expression.get(i));
 		}
 		
 		EvaluatePlus(expression);
@@ -447,13 +326,7 @@ public class Calc {
 				expression.remove(i);
 				continue;
 			}
-			//System.out.println(expression.get(i));
 		}
-		
-		
-		/*
-		System.out.printf("%.5f", Double.parseDouble(expression.get(0)));
-		System.out.println();*/
 		
 		return Double.parseDouble(expression.get(0));
 	}
@@ -523,12 +396,6 @@ public class Calc {
 		
 		EvaluateMult(A, left+1, right-1);
 		for (int i = 0; i < A.size(); i++) {
-			/*if (A.get(i).equals("") || A.get(i).equals(")") || A.get(i).equals("("))
-			{
-				if (A.get(i).equals("("))
-					left--;
-				else
-					right--;*/
 			if (A.get(i).equals(""))
 			{
 				right--;
@@ -539,14 +406,6 @@ public class Calc {
 		}
 		
 		EvaluatePlus(A, left+1, right-1);
-		/*for (int i = 0; i < A.size(); i++) {
-			if (A.get(i).equals(""))
-			{
-				A.remove(i);
-				continue;
-			}
-			System.out.println(A.get(i));
-		}*/
 		return deletedItems;
 	}
 	
@@ -625,7 +484,6 @@ public class Calc {
   public static void main(String[] argv) {
 	  
 	  
-    //System.out.print("skúška mikrofónu");
     /* VZOR: kod, ktery opisuje data ze standardniho vstupu na standardni vystup
      * a konci pokud narazi na konec vstupu.
      *
@@ -659,11 +517,6 @@ public class Calc {
          System.err.println("Nastala IOException");
        }
      
-     Double d = 0.0d;
-     
-     d = 12.5e2;
-     
-     d = Double.parseDouble("123.12");
      //System.out.printf("%.5f", d);
 
   }
